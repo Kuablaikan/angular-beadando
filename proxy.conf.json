@@ -1,0 +1,9 @@
+{
+  "/api/*": {
+    "target": "https://goweather.herokuapp.com/weather",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {"^/api" : ""}
+  }
+}
