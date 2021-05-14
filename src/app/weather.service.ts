@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { Observable, of } from "rxjs";
+import { map, catchError } from "rxjs/operators";
 
 import { Weather } from './weather';
+
+type NullableWeather = Weather | null;
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +16,17 @@ export class WeatherService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getWeatherOfCityFromAPI(city: string): Observable<Weather> {
-    return this.httpClient.get<Weather>(`api/${city}`).pipe(map((weather) => {
-      weather.city = city;
-      return weather;
-    }));
+  getWeatherOfCityFromAPI(city: string): Observable<NullableWeather> {
+    return this.httpClient.get<Weather>(`api/${city}`).pipe(
+      catchError(() => {
+        return of(null);
+      }),
+      map((weather) => {
+        if (weather)
+          weather.city = city;
+        return weather;
+      })
+    );
   }
 
   getWeatherOfCitiesFromAPI(cities: string[]): Observable<Weather[]> {
@@ -32,13 +40,21 @@ export class WeatherService {
       } else {
         const city: string = cities.pop() as string;
         return new Observable<Weather[]>((observer) => {
-          this.getWeatherOfCityFromAPI(city).subscribe((weather: Weather) => {
-            chainedAPICall(cities).subscribe((weatherList: Weather[]) => {
-              weatherList.push(weather);
-              observer.next(weatherList);
-              observer.complete();
+          this.getWeatherOfCityFromAPI(city).subscribe(
+            (weather: NullableWeather) => {
+              chainedAPICall(cities).subscribe((weatherList: Weather[]) => {
+                if (weather)
+                  weatherList.push(weather);
+                observer.next(weatherList);
+                observer.complete();
+              });
+            },
+            () => {
+              chainedAPICall(cities).subscribe((weatherList: Weather[]) => {
+                observer.next(weatherList);
+                observer.complete();
+              });
             });
-          });
         });
       }
     }
