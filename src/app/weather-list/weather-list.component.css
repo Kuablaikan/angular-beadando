@@ -1,0 +1,22 @@
+table{
+  width: 100%;
+}
+
+.mat-header-cell,
+.mat-cell {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.colSelect {
+  width: 16px;
+}
+
+.mat-row {
+  transition: background-color 0.2s;
+}
+
+.mat-row:hover {
+  background-color: #ececec;
+  cursor: pointer;
+}
