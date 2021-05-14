@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from "rxjs";
+import { BehaviorSubject, Observable, of } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 
 import { Weather } from './weather';
+import { initialCities } from "./initial-cities";
 
 type NullableWeather = Weather | null;
 
@@ -14,7 +15,13 @@ export class WeatherService {
 
   private static readonly storageKey: string = "weatherList";
 
-  constructor(private httpClient: HttpClient) { }
+  private storedWeatherSubject: BehaviorSubject<Weather[]> = new BehaviorSubject<Weather[]>([]);
+
+  constructor(private httpClient: HttpClient) {
+    this.getWeatherOfCitiesFromAPI(initialCities).subscribe(
+      (weatherList) => { this.saveWeatherListToStorage(weatherList); }
+    );
+  }
 
   getWeatherOfCityFromAPI(city: string): Observable<NullableWeather> {
     return this.httpClient.get<Weather>(`api/${city}`).pipe(
@@ -72,6 +79,11 @@ export class WeatherService {
 
   saveWeatherListToStorage(weatherList: Weather[]): void {
     localStorage.setItem(WeatherService.storageKey, JSON.stringify(weatherList));
+    this.storedWeatherSubject.next(weatherList);
+  }
+
+  getWeatherListObservable(): Observable<Weather[]> {
+    return this.storedWeatherSubject.asObservable();
   }
 
 }
