@@ -6,7 +6,14 @@ import { WeatherService } from "../weather.service";
 
 export class WeatherDataSource implements DataSource<Weather> {
 
-  constructor(private weatherService: WeatherService) { }
+  data: Weather[] = [];
+
+  constructor(private weatherService: WeatherService) {
+    this.weatherService.getWeatherListObservable().subscribe(
+      (weatherList) => {
+        this.data = weatherList;
+      });
+  }
 
   connect(collectionViewer: CollectionViewer): Observable<Weather[]> {
     return this.weatherService.getWeatherListObservable();
