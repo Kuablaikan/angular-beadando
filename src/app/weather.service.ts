@@ -18,9 +18,16 @@ export class WeatherService {
   private storedWeatherSubject: BehaviorSubject<Weather[]> = new BehaviorSubject<Weather[]>([]);
 
   constructor(private httpClient: HttpClient) {
-    this.getWeatherOfCitiesFromAPI(initialCities).subscribe(
-      (weatherList) => { this.saveWeatherListToStorage(weatherList); }
-    );
+    const weatherList = this.loadWeatherListFromStorage();
+    if (weatherList.length == 0) {
+      this.getWeatherOfCitiesFromAPI(initialCities).subscribe(
+        (weatherList) => {
+          this.saveWeatherListToStorage(weatherList);
+        }
+      );
+    } else {
+      this.storedWeatherSubject.next(weatherList);
+    }
   }
 
   getWeatherOfCityFromAPI(city: string): Observable<NullableWeather> {
@@ -72,13 +79,15 @@ export class WeatherService {
     const item = localStorage.getItem(WeatherService.storageKey);
     let weatherList: Weather[] = [];
     if (item) {
-      weatherList = JSON.parse(item) as Weather[];
+      const parsed = JSON.parse(item);
+      if (Date.now() <= parsed.expiry)
+        weatherList = parsed.data as Weather[];
     }
     return weatherList;
   }
 
-  saveWeatherListToStorage(weatherList: Weather[]): void {
-    localStorage.setItem(WeatherService.storageKey, JSON.stringify(weatherList));
+  saveWeatherListToStorage(weatherList: Weather[], expiry: number = Date.now() + 15*60*1000): void {
+    localStorage.setItem(WeatherService.storageKey, JSON.stringify({ expiry: expiry, data: weatherList }));
     this.storedWeatherSubject.next(weatherList);
   }
 
