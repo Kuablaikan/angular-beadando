@@ -28,6 +28,11 @@ export class WeatherListComponent {
       weatherList[this._weatherProviderService.index] = this._weatherProviderService.weather;
       this._weatherService.saveWeatherListToStorage(weatherList);
     }
+    else if (this._weatherProviderService.isNew) {
+      let weatherList: Weather[] = this.weatherList.data;
+      weatherList.push(this._weatherProviderService.weather);
+      this._weatherService.saveWeatherListToStorage(weatherList);
+    }
   }
 
   isAllRowsSelected() : boolean {
@@ -49,9 +54,17 @@ export class WeatherListComponent {
     );
   }
 
-  rowClicked(row: Weather, index: number): void {
+  editRow(row: Weather, index: number): void {
     this._weatherProviderService.weather = row;
     this._weatherProviderService.index = index;
+    this._weatherProviderService.isNew = false;
+    this._router.navigate(['/details']);
+  }
+
+  newRow(): void {
+    this._weatherProviderService.weather = { city: "", temperature: "", wind: "", description: "" };
+    this._weatherProviderService.index = -1;
+    this._weatherProviderService.isNew = true;
     this._router.navigate(['/details']);
   }
 

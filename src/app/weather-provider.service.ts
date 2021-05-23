@@ -9,6 +9,7 @@ export class WeatherProviderService {
 
   weather: Weather = { city: "", temperature: "", wind: "", description: "" };
   index: number = -1;
+  isNew: boolean = false;
 
   constructor() { }
 

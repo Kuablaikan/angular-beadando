@@ -1,4 +1,4 @@
-<button mat-stroked-button matTooltip="Add new row"><mat-icon>add</mat-icon></button>
+<button mat-stroked-button (click)="newRow()" matTooltip="Add new row"><mat-icon>add</mat-icon></button>
 <button mat-stroked-button (click)="removeSelectedRows()" matTooltip="Delete selected rows"><mat-icon>delete_outline</mat-icon></button>
 
 <mat-table [dataSource]="weatherList">
@@ -40,6 +40,6 @@
 
   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
 
-  <mat-row *matRowDef="let row; columns: displayedColumns; let index = index" (click)="rowClicked(row, index)"></mat-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns; let index = index" (click)="editRow(row, index)"></mat-row>
 
 </mat-table>

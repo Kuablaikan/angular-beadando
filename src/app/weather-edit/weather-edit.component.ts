@@ -24,6 +24,8 @@ export class WeatherEditComponent {
   }
 
   cancelAndNavigateBack(): void {
+    this._weatherProviderService.index = -1;
+    this._weatherProviderService.isNew = false;
     this._router.navigate(['/list']);
   }
 
