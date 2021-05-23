@@ -13,11 +13,13 @@ type NullableWeather = Weather | null;
 })
 export class WeatherService {
 
-  private static readonly storageKey: string = "weatherList";
+  private static readonly _storageKey: string = "weatherList";
+  private static readonly _expiryTime: number = 15 * 60 * 1000;
+  private static readonly _waitTimeBetweenChainedCalls = 250;
 
-  private storedWeatherSubject: BehaviorSubject<Weather[]> = new BehaviorSubject<Weather[]>([]);
+  private _storedWeatherSubject: BehaviorSubject<Weather[]> = new BehaviorSubject<Weather[]>([]);
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private _httpClient: HttpClient) {
     const weatherList = this.loadWeatherListFromStorage();
     if (weatherList.length == 0) {
       this.getWeatherOfCitiesFromAPI(initialCities).subscribe(
@@ -26,12 +28,12 @@ export class WeatherService {
         }
       );
     } else {
-      this.storedWeatherSubject.next(weatherList);
+      this._storedWeatherSubject.next(weatherList);
     }
   }
 
   getWeatherOfCityFromAPI(city: string): Observable<NullableWeather> {
-    return this.httpClient.get<Weather>(`api/${city}`).pipe(
+    return this._httpClient.get<Weather>(`api/${city}`).pipe(
       catchError(() => {
         return of(null);
       }),
@@ -56,18 +58,22 @@ export class WeatherService {
         return new Observable<Weather[]>((observer) => {
           this.getWeatherOfCityFromAPI(city).subscribe(
             (weather: NullableWeather) => {
-              chainedAPICall(cities).subscribe((weatherList: Weather[]) => {
-                if (weather)
-                  weatherList.push(weather);
-                observer.next(weatherList);
-                observer.complete();
-              });
+              setTimeout(() => {
+                chainedAPICall(cities).subscribe((weatherList: Weather[]) => {
+                  if (weather)
+                    weatherList.push(weather);
+                  observer.next(weatherList);
+                  observer.complete();
+                });
+              }, WeatherService._waitTimeBetweenChainedCalls);
             },
             () => {
-              chainedAPICall(cities).subscribe((weatherList: Weather[]) => {
-                observer.next(weatherList);
-                observer.complete();
-              });
+              setTimeout(() => {
+                chainedAPICall(cities).subscribe((weatherList: Weather[]) => {
+                  observer.next(weatherList);
+                  observer.complete();
+                });
+              }, WeatherService._waitTimeBetweenChainedCalls);
             });
         });
       }
@@ -76,7 +82,7 @@ export class WeatherService {
   }
 
   loadWeatherListFromStorage(): Weather[] {
-    const item = localStorage.getItem(WeatherService.storageKey);
+    const item = localStorage.getItem(WeatherService._storageKey);
     let weatherList: Weather[] = [];
     if (item) {
       const parsed = JSON.parse(item);
@@ -86,13 +92,13 @@ export class WeatherService {
     return weatherList;
   }
 
-  saveWeatherListToStorage(weatherList: Weather[], expiry: number = Date.now() + 15*60*1000): void {
-    localStorage.setItem(WeatherService.storageKey, JSON.stringify({ expiry: expiry, data: weatherList }));
-    this.storedWeatherSubject.next(weatherList);
+  saveWeatherListToStorage(weatherList: Weather[], expiry: number = Date.now() + WeatherService._expiryTime): void {
+    localStorage.setItem(WeatherService._storageKey, JSON.stringify({ expiry: expiry, data: weatherList }));
+    this._storedWeatherSubject.next(weatherList);
   }
 
   getWeatherListObservable(): Observable<Weather[]> {
-    return this.storedWeatherSubject.asObservable();
+    return this._storedWeatherSubject.asObservable();
   }
 
 }
