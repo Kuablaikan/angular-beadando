@@ -8,15 +8,15 @@ export class WeatherDataSource implements DataSource<Weather> {
 
   data: Weather[] = [];
 
-  constructor(private weatherService: WeatherService) {
-    this.weatherService.getWeatherListObservable().subscribe(
+  constructor(private _weatherService: WeatherService) {
+    this._weatherService.getWeatherListObservable().subscribe(
       (weatherList) => {
         this.data = weatherList;
       });
   }
 
   connect(collectionViewer: CollectionViewer): Observable<Weather[]> {
-    return this.weatherService.getWeatherListObservable();
+    return this._weatherService.getWeatherListObservable();
   }
 
   disconnect(collectionViewer: CollectionViewer): void { }
