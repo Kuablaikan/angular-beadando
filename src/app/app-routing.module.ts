@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from "@angular/router";
 
 import { WeatherListComponent } from "./weather-list/weather-list.component";
-import { WeatherDetailsComponent } from "./weather-details/weather-details.component";
+import { WeatherEditComponent } from "./weather-edit/weather-edit.component";
 
 const appRoutes: Routes = [
   { path: 'list', component: WeatherListComponent },
-  { path: 'details', component: WeatherDetailsComponent },
+  { path: 'details', component: WeatherEditComponent },
   { path: '**', component: WeatherListComponent }
 ];
 
