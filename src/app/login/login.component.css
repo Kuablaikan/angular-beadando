@@ -1,0 +1,22 @@
+.mat-form-field {
+  display: block;
+}
+
+button {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+  width: 150px;
+}
+
+.errorMessage {
+  display: none;
+  color: #ff0000;
+  padding: 15px;
+  justify-content: center;
+  margin: auto;
+}
+
+.showErrorMessage {
+  display: flex;
+}
