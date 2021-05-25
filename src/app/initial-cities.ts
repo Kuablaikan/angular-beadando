@@ -1,3 +1,3 @@
 export const initialCities: string[] = [
-  "Pécs", "Budapest", "Szeged"
+  "Budapest", "Debrecen", "Pécs", "Szeged", "Győr"
 ];
