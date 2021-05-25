@@ -1,3 +1,25 @@
 <button mat-stroked-button (click)="saveAndNavigateBack()" matTooltip="Save and navigate back"><mat-icon>arrow_back</mat-icon></button>
 <button mat-stroked-button (click)="cancelAndNavigateBack()" matTooltip="Cancel and navigate back"><mat-icon>close</mat-icon></button>
-<app-weather-details [(weather)]="weather"></app-weather-details>
+<form [formGroup]="weatherForm">
+
+  <mat-form-field>
+    <mat-label>City</mat-label>
+    <input type="text" matInput formControlName="city">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Temperature</mat-label>
+    <input type="text" matInput formControlName="temperature">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Wind</mat-label>
+    <input type="text" matInput formControlName="wind">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Description</mat-label>
+    <input type="text" matInput formControlName="description">
+  </mat-form-field>
+
+</form>
