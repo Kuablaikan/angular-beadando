@@ -1,5 +1,6 @@
 <button mat-stroked-button (click)="saveAndNavigateBack()" matTooltip="Save and navigate back"><mat-icon>arrow_back</mat-icon></button>
 <button mat-stroked-button (click)="cancelAndNavigateBack()" matTooltip="Cancel and navigate back"><mat-icon>close</mat-icon></button>
+<p class="errorMessage" [class.showErrorMessage]="showErrorMessage !== undefined && showErrorMessage">You have to fill out every text field!</p>
 <form [formGroup]="weatherForm">
 
   <mat-form-field>
